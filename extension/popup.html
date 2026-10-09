@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>YouTube Playlist Extractor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header__brand">
+        <div class="header__logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="4" width="20" height="16" rx="4" fill="#FF0000"/>
+            <polygon points="10,8.5 16,12 10,15.5" fill="#FFFFFF"/>
+          </svg>
+        </div>
+        <h1 class="header__title">Playlist Link Extractor</h1>
+      </div>
+    </header>
+
+    <!-- Unified Input Bar -->
+    <section class="input-section">
+      <div class="input-pill">
+        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+        <input
+          type="url"
+          id="playlist-url"
+          class="input-field"
+          placeholder="Paste YouTube playlist URL..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="extract-btn" class="extract-btn">
+          <span class="btn-label">Extract</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+      <p id="input-error" class="input-error" role="alert"></p>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results-section" class="results-section hidden">
+      <!-- Playlist Summary Header -->
+      <div class="playlist-header">
+        <div class="playlist-header__meta">
+          <h2 id="playlist-title" class="playlist-header__title"></h2>
+          <span id="video-count" class="badge badge--success"></span>
+        </div>
+        <div class="playlist-header__actions">
+          <button id="copy-btn" class="btn btn--primary" title="Copy all links">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copy All</span>
+          </button>
+          <button id="download-btn" class="btn btn--secondary" title="Download as .txt">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>TXT</span>
+          </button>
+          <button id="clear-btn" class="btn btn--ghost-danger" title="Clear">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Pinned Current Video Card -->
+      <div id="current-video-card" class="current-video-card hidden">
+        <div class="current-video-card__badge-wrap">
+          <span class="current-video-card__badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+            NOW PLAYING
+          </span>
+          <span id="current-video-index" class="current-video-card__index"></span>
+        </div>
+        <div class="current-video-card__info">
+          <div id="current-video-title" class="current-video-card__title"></div>
+          <a id="current-video-url" class="current-video-card__url" href="#" target="_blank" rel="noopener"></a>
+        </div>
+        <div class="current-video-card__actions">
+          <button id="current-copy-link-btn" class="btn btn--primary btn--sm" title="Copy video link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copy Link</span>
+          </button>
+          <button id="current-copy-transcript-btn" class="btn btn--transcript btn--sm" title="Copy transcript directly">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span>Copy Transcript</span>
+          </button>
+          <button id="current-view-transcript-btn" class="btn btn--secondary btn--sm" title="View transcript in modal">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>View</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Range Copy Box -->
+      <div class="range-card">
+        <div class="range-card__inputs">
+          <span class="range-card__label">Range Selection</span>
+          <div class="range-input-group">
+            <input type="number" id="range-from" class="range-num-input" min="1" placeholder="1" />
+            <span class="range-sep">to</span>
+            <input type="number" id="range-to" class="range-num-input" min="1" placeholder="N" />
+          </div>
+        </div>
+        <div class="range-card__buttons">
+          <button id="copy-range-btn" class="btn btn--range" title="Copy selected range of video links">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copy Links</span>
+          </button>
+          <button id="copy-transcripts-btn" class="btn btn--transcript" title="Copy transcripts for selected range of videos">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span>Copy Transcripts</span>
+          </button>
+          <button id="download-transcripts-btn" class="btn btn--transcript-outline" title="Download transcripts text file for selected range">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Save TXT</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Search / Filter Bar -->
+      <div class="search-box">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="search-filter" class="search-input" placeholder="Filter videos by title or keyword..." />
+        <button id="search-clear-btn" class="search-clear hidden" title="Clear filter">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <ul id="video-list" class="video-list"></ul>
+    </section>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="loading-state hidden">
+      <div class="spinner-large"></div>
+      <p class="loading-state__text">Extracting playlist...</p>
+      <p class="loading-state__hint" id="loading-hint">Connecting to YouTube</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="state-message hidden">
+      <p id="empty-state-text">The playlist is empty or unavailable.</p>
+    </div>
+
+    <!-- Transcript Modal -->
+    <div id="transcript-modal" class="transcript-modal hidden">
+      <div class="transcript-modal__backdrop"></div>
+      <div class="transcript-modal__container">
+        <div class="transcript-modal__header">
+          <div class="transcript-modal__title-wrap">
+            <svg class="transcript-modal__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <h3 id="transcript-modal-title" class="transcript-modal__title">Transcript</h3>
+          </div>
+          <div class="transcript-modal__actions">
+            <select id="transcript-lang-select" class="lang-select" title="Select caption language">
+              <option value="en">English</option>
+            </select>
+            <button id="transcript-copy-btn" class="btn btn--primary">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+            <button id="transcript-download-btn" class="btn btn--secondary">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>TXT</span>
+            </button>
+            <button id="transcript-close-btn" class="btn btn--ghost-danger">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="transcript-content" class="transcript-modal__content">
+          <div class="transcript-loading">
+            <div class="spinner-large"></div>
+            <p>Fetching transcript...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

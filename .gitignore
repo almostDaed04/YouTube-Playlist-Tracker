@@ -1,0 +1,16 @@
+node_modules/
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.log
+dump.json
+tracks.json
+url.txt
+sample_cap.xml
+*.vtt
+test_*.js
+fix_*.js
+patch*.js
+recover*.js
+safe_patch.js

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Playlist Link Extractor</title>
+  <meta name="description" content="Extract all video links from any YouTube playlist instantly. No downloads, no API key required." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header__icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="4" width="20" height="16" rx="3" fill="#FF4444"/>
+          <polygon points="10,8.5 16,12 10,15.5" fill="#fff"/>
+        </svg>
+      </div>
+      <h1 class="header__title">Playlist Link Extractor</h1>
+      <p class="header__subtitle">Paste a YouTube playlist URL and extract all video links instantly.</p>
+    </header>
+
+    <!-- Input Section -->
+    <section class="input-section">
+      <div class="input-group">
+        <input
+          type="url"
+          id="playlist-url"
+          class="input-group__field"
+          placeholder="Paste YouTube playlist URL..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="extract-btn" class="input-group__btn">
+          <span class="btn-label">Extract Links</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
+        </button>
+      </div>
+      <p id="input-error" class="input-error" role="alert"></p>
+    </section>
+
+    <!-- Status / Results Section -->
+    <section id="results-section" class="results-section hidden">
+      <!-- Results Header -->
+      <div class="results-header">
+        <div class="results-header__info">
+          <h2 id="playlist-title" class="results-header__title"></h2>
+          <span id="video-count" class="results-header__count"></span>
+        </div>
+        <div class="results-header__actions">
+          <button id="copy-btn" class="action-btn" title="Copy all links to clipboard">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copy All</span>
+          </button>
+          <button id="download-btn" class="action-btn" title="Download links as .txt file">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download TXT</span>
+          </button>
+          <button id="clear-btn" class="action-btn action-btn--danger" title="Clear results">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span>Clear</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Video List -->
+      <ul id="video-list" class="video-list"></ul>
+    </section>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-overlay__content">
+        <div class="spinner-large"></div>
+        <p class="loading-overlay__text">Extracting playlist links…</p>
+        <p class="loading-overlay__hint">This may take a moment for large playlists.</p>
+      </div>
+    </div>
+
+    <!-- Empty / Error States -->
+    <div id="empty-state" class="state-message hidden">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      <p id="empty-state-text">The playlist is empty or all videos are unavailable.</p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Uses <code>yt-dlp</code> for metadata extraction &middot; No videos are downloaded</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
